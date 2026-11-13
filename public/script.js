@@ -19,6 +19,9 @@ document.addEventListener('DOMContentLoaded', function () {
   /** Index of the current (playing or last played) track */
   let current = 0
 
+  /** Whether any track has been started yet */
+  let started = false
+
   /**
    * Start playback; ignore the rejection that happens when play() is
    * interrupted by pause() or by switching to another track.
@@ -47,7 +50,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (trackName) {
       const caption = audio.closest('figure').querySelector('figcaption')
-      if (isPlaying && caption) {
+      if (started && caption) {
         trackName.innerHTML = caption.innerHTML
         trackName.lang = caption.lang
       } else {
@@ -93,6 +96,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
       })
       current = index
+      started = true
       updateOverlay()
     })
 
