@@ -36,3 +36,17 @@ section {
     aspect-ratio: 1;
     width: 100%;
 }
+
+.tracks figure {
+    margin: 0;
+    width: 100%;
+}
+
+.tracks li {
+    margin-block-end: 1rem;
+    padding-inline: .25rem;
+}
+
+audio {
+    width: 100%;
+}
