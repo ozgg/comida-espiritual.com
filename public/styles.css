@@ -1,5 +1,9 @@
 /** { outline: solid pink 1px }*/
 
+:root {
+    --text-color-inverted: #fff;
+}
+
 html {
     margin: 0;
     padding: 0;
@@ -44,6 +48,12 @@ section {
     padding: 1rem;
     position: absolute;
     z-index: 2;
+}
+
+.overlay p {
+    color: var(--text-color-inverted);
+    font-size: 2rem;
+    margin: 0;
 }
 
 .overlay.stopped .playing {
