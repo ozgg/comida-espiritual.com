@@ -40,8 +40,8 @@ section {
 }
 
 .overlay {
-    background: rgba(0, 0, 0, .5);
-    backdrop-filter: blur(.5rem);
+    background: rgba(0, 0, 0, .125);
+    backdrop-filter: blur(.25rem);
     bottom: 0;
     left: 0;
     right: 0;
@@ -69,6 +69,7 @@ section {
     display: flex;
     justify-content: space-between;
     gap: 1rem;
+    padding-inline: 2rem;
 }
 
 .controls button {
