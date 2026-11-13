@@ -1,3 +1,5 @@
+/** { outline: solid pink 1px }*/
+
 html {
     margin: 0;
     padding: 0;
@@ -26,10 +28,41 @@ section {
     text-align: center;
 }
 
-.cover div {
+.cover > div {
     align-items: center;
     display: flex;
     justify-content: center;
+    position: relative;
+}
+
+.overlay {
+    background: rgba(0, 0, 0, .5);
+    backdrop-filter: blur(.5rem);
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1rem;
+    position: absolute;
+    z-index: 2;
+}
+
+.overlay.stopped .playing {
+    display: none;
+}
+
+.overlay:not(.stopped) .paused {
+    display: none;
+}
+
+.controls {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.controls button {
+    font-size: 2rem;
 }
 
 .cover img {
@@ -49,4 +82,8 @@ section {
 
 audio {
     width: 100%;
+}
+
+.hidden {
+    display: none;
 }
