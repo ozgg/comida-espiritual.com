@@ -19,6 +19,9 @@ document.addEventListener('DOMContentLoaded', function () {
   /** Index of the current (playing or last played) track */
   let current = 0
 
+  /** Page title to restore / append to */
+  const albumTitle = document.title
+
   /** Whether any track has been started yet */
   let started = false
 
@@ -48,8 +51,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     overlay.classList.toggle('stopped', !isPlaying)
 
+    const caption = audio.closest('figure').querySelector('figcaption')
+
+    document.title = started && caption
+      ? `${caption.textContent.trim()} — ${albumTitle}`
+      : albumTitle
+
     if (trackName) {
-      const caption = audio.closest('figure').querySelector('figcaption')
       if (started && caption) {
         trackName.innerHTML = caption.innerHTML
         trackName.lang = caption.lang
@@ -65,6 +73,116 @@ document.addEventListener('DOMContentLoaded', function () {
     if (nextButton) {
       nextButton.disabled = current === tracks.length - 1
     }
+
+    updateMediaSession(isPlaying, caption)
+  }
+
+  /**
+   * Media Session API: track info and controls on the lock screen,
+   * in OS media widgets and for hardware media keys
+   */
+  const mediaSession = 'mediaSession' in navigator ? navigator.mediaSession : null
+  const coverImage = document.querySelector('.cover img')
+  let metadataTrack = -1
+
+  /**
+   * Register a media action handler, ignoring actions the browser lacks
+   *
+   * @param action {MediaSessionAction}
+   * @param handler {Function|null}
+   */
+  const setAction = function (action, handler) {
+    try {
+      mediaSession.setActionHandler(action, handler)
+    } catch (error) {
+      // Action is not supported by this browser
+    }
+  }
+
+  /**
+   * @param isPlaying {Boolean}
+   * @param caption {HTMLElement|null}
+   */
+  const updateMediaSession = function (isPlaying, caption) {
+    if (!mediaSession || !started) {
+      return
+    }
+
+    if (metadataTrack !== current && 'MediaMetadata' in window) {
+      metadataTrack = current
+      mediaSession.metadata = new MediaMetadata({
+        title: caption ? caption.textContent.trim() : '',
+        artist: 'Dr. von Ozgg',
+        album: 'Comida Espiritual',
+        artwork: coverImage ? [{
+          src: new URL(coverImage.getAttribute('src'), document.baseURI).href,
+          sizes: '1074x1075',
+          type: 'image/jpeg',
+        }] : [],
+      })
+    }
+
+    mediaSession.playbackState = isPlaying ? 'playing' : 'paused'
+
+    // Hide prev/next in OS controls when there is no adjacent track
+    setAction('previoustrack', current > 0 ? function () {
+      playTrack(current - 1)
+    } : null)
+    setAction('nexttrack', current < tracks.length - 1 ? function () {
+      playTrack(current + 1)
+    } : null)
+  }
+
+  /**
+   * Keep the OS progress bar in sync with the current track
+   */
+  const updatePosition = function () {
+    const audio = tracks[current]
+    if (!mediaSession || !('setPositionState' in mediaSession) || !isFinite(audio.duration)) {
+      return
+    }
+
+    try {
+      mediaSession.setPositionState({
+        duration: audio.duration,
+        playbackRate: audio.playbackRate,
+        position: Math.min(audio.currentTime, audio.duration),
+      })
+    } catch (error) {
+      // Invalid state, e.g. during track switch
+    }
+  }
+
+  if (mediaSession) {
+    setAction('play', function () {
+      play(tracks[current])
+    })
+    setAction('pause', function () {
+      tracks[current].pause()
+    })
+    setAction('stop', function () {
+      tracks[current].pause()
+      tracks[current].currentTime = 0
+    })
+    setAction('seekto', function (details) {
+      const audio = tracks[current]
+      if (details.fastSeek && 'fastSeek' in audio) {
+        audio.fastSeek(details.seekTime)
+      } else {
+        audio.currentTime = details.seekTime
+      }
+      updatePosition()
+    })
+    setAction('seekbackward', function (details) {
+      const audio = tracks[current]
+      audio.currentTime = Math.max(audio.currentTime - (details.seekOffset || 10), 0)
+      updatePosition()
+    })
+    setAction('seekforward', function (details) {
+      const audio = tracks[current]
+      audio.currentTime = Math.min(audio.currentTime + (details.seekOffset || 10), audio.duration)
+      updatePosition()
+    })
   }
 
   /**
@@ -98,9 +216,22 @@ document.addEventListener('DOMContentLoaded', function () {
       current = index
       started = true
       updateOverlay()
+      updatePosition()
     })
 
     audio.addEventListener('pause', updateOverlay)
+
+    audio.addEventListener('loadedmetadata', function () {
+      if (index === current) {
+        updatePosition()
+      }
+    })
+
+    audio.addEventListener('seeked', function () {
+      if (index === current) {
+        updatePosition()
+      }
+    })
 
     audio.addEventListener('ended', function () {
       if (index < tracks.length - 1) {
