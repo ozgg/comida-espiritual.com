@@ -9,6 +9,20 @@
   <link rel="shortcut icon" href="/favicon.ico" />
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
   <link rel="manifest" href="/site.webmanifest" />
+  <meta name="description" content="Comida Espiritual — food metal: LP, 17 треков, ~45 минут. Слушать онлайн и читать об альбоме." />
+  <meta property="og:type" content="music.album" />
+  <meta property="og:site_name" content="Comida Espiritual" />
+  <meta property="og:locale" content="ru_RU" />
+  <meta property="og:title" content="Comida Espiritual (2026)" />
+  <meta property="og:description" content="Food metal: LP, 17 треков, ~45 минут. Слушать онлайн и читать об альбоме." />
+  <meta property="og:url" content="https://comida-espiritual.com/" />
+  <meta property="og:image" content="https://comida-espiritual.com/media/og-cover.jpg" />
+  <meta property="og:image:type" content="image/jpeg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Обложка альбома: кричащий перец" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="canonical" href="https://comida-espiritual.com/" />
   <link rel="stylesheet" href="/styles.css" />
   <script src="/script.js" defer></script>
 </head>
@@ -17,7 +31,19 @@
   <h1 lang="es" translate="no">Comida Espiritual</h1>
   <figure class="cover">
     <div>
-      <img src="/media/comida-espiritual.jpg" alt="Обложка альбома: кричащий перец, акрил, холст, 2025 год"/>
+      <picture>
+        <source type="image/avif"
+                srcset="/media/cover-480.avif 480w, /media/cover-720.avif 720w, /media/cover-1074.avif 1074w"
+                sizes="(min-width: 40rem) 40rem, 100vw"/>
+        <source type="image/webp"
+                srcset="/media/cover-480.webp 480w, /media/cover-720.webp 720w, /media/cover-1074.webp 1074w"
+                sizes="(min-width: 40rem) 40rem, 100vw"/>
+        <img src="/media/cover-1074.jpg"
+             srcset="/media/cover-480.jpg 480w, /media/cover-720.jpg 720w, /media/cover-1074.jpg 1074w"
+             sizes="(min-width: 40rem) 40rem, 100vw"
+             width="1074" height="1075"
+             alt="Обложка альбома: кричащий перец, акрил, холст, 2025 год"/>
+      </picture>
       <div class="overlay stopped hidden">
         <p title="Текущий трек"></p>
         <div class="controls">

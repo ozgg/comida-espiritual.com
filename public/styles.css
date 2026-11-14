@@ -76,8 +76,14 @@ section {
     font-size: 2rem;
 }
 
+.cover picture {
+    display: block;
+    width: 100%;
+}
+
 .cover img {
-    aspect-ratio: 1;
+    display: block;
+    height: auto;
     width: 100%;
 }
 

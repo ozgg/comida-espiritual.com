@@ -82,7 +82,6 @@ document.addEventListener('DOMContentLoaded', function () {
    * in OS media widgets and for hardware media keys
    */
   const mediaSession = 'mediaSession' in navigator ? navigator.mediaSession : null
-  const coverImage = document.querySelector('.cover img')
   let metadataTrack = -1
 
   /**
@@ -114,11 +113,13 @@ document.addEventListener('DOMContentLoaded', function () {
         title: caption ? caption.textContent.trim() : '',
         artist: 'Dr. von Ozgg',
         album: 'Comida Espiritual',
-        artwork: coverImage ? [{
-          src: new URL(coverImage.getAttribute('src'), document.baseURI).href,
-          sizes: '1074x1075',
-          type: 'image/jpeg',
-        }] : [],
+        artwork: [
+          { src: '/media/cover-256.jpg', sizes: '256x256', type: 'image/jpeg' },
+          { src: '/media/cover-480.jpg', sizes: '480x480', type: 'image/jpeg' },
+          { src: '/media/cover-1074.jpg', sizes: '1074x1075', type: 'image/jpeg' },
+        ].map(function (image) {
+          return Object.assign(image, { src: new URL(image.src, document.baseURI).href })
+        }),
       })
     }
 
