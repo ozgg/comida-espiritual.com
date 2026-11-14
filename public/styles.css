@@ -89,7 +89,24 @@ section {
 }
 
 .controls button {
+    align-items: center;
+    aspect-ratio: 1;
+    background: rgba(255, 255, 255, .5);
+    backdrop-filter: blur(.125rem);
+    border: none;
+    border-radius: 50%;
+    display: flex;
     font-size: 2rem;
+    justify-content: center;
+    width: 4rem;
+}
+
+.controls button:not(:disabled) {
+    box-shadow: 0 0 .5rem orangered;
+}
+
+.controls button:focus {
+    box-shadow: inset 0 0 .75rem red;
 }
 
 .cover picture {
