@@ -1,6 +1,11 @@
 {
-  "name": "MyWebSite",
-  "short_name": "MySite",
+  "id": "/",
+  "name": "Comida Espiritual",
+  "short_name": "Comida",
+  "description": "Food metal: LP, 17 треков, ~45 минут.",
+  "lang": "ru",
+  "start_url": "/",
+  "scope": "/",
   "icons": [
     {
       "src": "/web-app-manifest-192x192.png",
