@@ -56,6 +56,22 @@ section {
     margin: 0;
 }
 
+.progress {
+    align-items: center;
+    color: var(--text-color-inverted);
+    display: flex;
+    font-variant-numeric: tabular-nums;
+    gap: .5rem;
+    margin-block: .5rem;
+}
+
+.progress input {
+    accent-color: var(--text-color-inverted);
+    flex: 1;
+    margin: 0;
+    min-width: 0;
+}
+
 .overlay.stopped .playing {
     display: none;
 }
@@ -69,7 +85,7 @@ section {
     display: flex;
     justify-content: space-between;
     gap: 1rem;
-    padding-inline: 2rem;
+    padding-inline: 1rem;
 }
 
 .controls button {

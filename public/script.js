@@ -15,6 +15,13 @@ document.addEventListener('DOMContentLoaded', function () {
   const playButton = overlay.querySelector('.play')
   const prevButton = overlay.querySelector('.prev')
   const nextButton = overlay.querySelector('.next')
+  const progressBar = overlay.querySelector('.progress input')
+  const elapsedLabel = overlay.querySelector('.progress .elapsed')
+  const durationLabel = overlay.querySelector('.progress .duration')
+
+  /** User is dragging the progress bar: don't overwrite its value */
+  let dragging = false
+  let frameRequest = 0
 
   /** Index of the current (playing or last played) track */
   let current = 0
@@ -43,6 +50,53 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   /**
+   * @param seconds {Number}
+   * @returns {String} m:ss
+   */
+  const formatTime = function (seconds) {
+    if (!isFinite(seconds) || seconds < 0) {
+      return '0:00'
+    }
+    const s = Math.floor(seconds)
+    return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
+  }
+
+  /**
+   * Show current track's position and duration in the overlay
+   */
+  const renderProgress = function () {
+    if (!progressBar) {
+      return
+    }
+
+    const audio = tracks[current]
+    const duration = isFinite(audio.duration) ? audio.duration : 0
+
+    progressBar.max = String(duration)
+    if (durationLabel) {
+      durationLabel.textContent = formatTime(duration)
+    }
+
+    if (!dragging) {
+      progressBar.value = String(Math.min(audio.currentTime, duration))
+      if (elapsedLabel) {
+        elapsedLabel.textContent = formatTime(audio.currentTime)
+      }
+    }
+  }
+
+  /**
+   * Redraw progress every frame while playing (timeupdate alone is ~4 Hz)
+   */
+  const animateProgress = function () {
+    renderProgress()
+    const audio = tracks[current]
+    frameRequest = !audio.paused && !audio.ended
+      ? requestAnimationFrame(animateProgress)
+      : 0
+  }
+
+  /**
    * Sync overlay with the actual playback state
    */
   const updateOverlay = function () {
@@ -50,6 +104,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const isPlaying = !audio.paused && !audio.ended
 
     overlay.classList.toggle('stopped', !isPlaying)
+
+    renderProgress()
+    if (isPlaying && !frameRequest) {
+      frameRequest = requestAnimationFrame(animateProgress)
+    }
 
     const caption = audio.closest('figure').querySelector('figcaption')
 
@@ -236,6 +295,7 @@ document.addEventListener('DOMContentLoaded', function () {
       if (index !== current) {
         return
       }
+      renderProgress()
       const shownAsStopped = overlay.classList.contains('stopped')
       if (shownAsStopped !== (audio.paused || audio.ended)) {
         updateOverlay()
@@ -251,7 +311,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
     audio.addEventListener('seeked', function () {
       if (index === current) {
+        renderProgress()
         updatePosition()
+      }
+    })
+
+    audio.addEventListener('durationchange', function () {
+      if (index === current) {
+        renderProgress()
       }
     })
 
@@ -272,6 +339,26 @@ document.addEventListener('DOMContentLoaded', function () {
       } else {
         audio.pause()
       }
+    })
+  }
+
+  if (progressBar) {
+    // While dragging: only move the label; seek on release
+    progressBar.addEventListener('input', function () {
+      dragging = true
+      if (elapsedLabel) {
+        elapsedLabel.textContent = formatTime(Number(progressBar.value))
+      }
+    })
+
+    progressBar.addEventListener('change', function () {
+      const audio = tracks[current]
+      if (isFinite(audio.duration)) {
+        audio.currentTime = Number(progressBar.value)
+      }
+      dragging = false
+      renderProgress()
+      updatePosition()
     })
   }
 
