@@ -222,6 +222,27 @@ document.addEventListener('DOMContentLoaded', function () {
 
     audio.addEventListener('pause', updateOverlay)
 
+    // iOS may send a stale 'pause' around track switches (especially when
+    // locked) and then keep playing without a new 'play' event: resync
+    // from the element's real state
+    audio.addEventListener('playing', function () {
+      if (index === current) {
+        updateOverlay()
+        updatePosition()
+      }
+    })
+
+    audio.addEventListener('timeupdate', function () {
+      if (index !== current) {
+        return
+      }
+      const shownAsStopped = overlay.classList.contains('stopped')
+      if (shownAsStopped !== (audio.paused || audio.ended)) {
+        updateOverlay()
+        updatePosition()
+      }
+    })
+
     audio.addEventListener('loadedmetadata', function () {
       if (index === current) {
         updatePosition()
